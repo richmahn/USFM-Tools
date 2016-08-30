@@ -178,3 +178,4 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
     def renderCL(self, token):       self.chapterLabel = token.value
     def renderQR(self, token):       self.write(u'')
     def renderFQA(self, token):      self.write(u'] ' + token.value)
+    def renderFQB(self, token):      self.write(u': ' + token.value)
