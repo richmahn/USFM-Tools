@@ -12,7 +12,7 @@ def read(f_name):
 
 setup(
     name="usfm_tools",
-    version="0.0.3",
+    version="0.0.4",
     author="unfoldingWord",
     author_email="unfoldingword.org",
     description="A framework for transforming .usfm files into specified targets",
