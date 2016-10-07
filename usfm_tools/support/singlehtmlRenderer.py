@@ -37,12 +37,18 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
     def render(self):
         self.loadUSFM(self.inputDir)
         self.f = codecs.open(self.outputFilename, 'w', 'utf_8_sig')
+        self.run()
+        self.writeFootnotes()
+        self.f.write('</body></html>')
+        self.f.close()
+
+    def writeHeader(self):
         h = u"""
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
         <html xmlns="http://www.w3.org/1999/xhtml">
         <head>
             <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-            <title>Bible</title>
+            <title>""" + self.bookName + u"""</title>
             <style media="all" type="text/css">
             .indent-0 {
                 margin-left:0em;
@@ -83,12 +89,9 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
 
         </head>
         <body>
+        <h1>""" + self.bookName + u"""</h1>
         """
         self.f.write(h.encode('utf-8'))
-        self.run()
-        self.writeFootnotes()
-        self.f.write('</body></html>')
-        self.f.close()
 
     def startLI(self):
         self.lineIndent += 1
@@ -122,16 +125,19 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
     def renderID(self, token):
         self.cb = books.bookKeyForIdValue(token.value)
         self.indentFlag = False
-        self.write(u'\n\n<span id="' + self.cb + u'"></span>\n')
+        #self.write(u'\n\n<span id="' + self.cb + u'"></span>\n')
 
     def renderH(self, token):
-        self.bookname = token.value
+        self.bookName = token.value
+        self.writeHeader()
 
     def renderTOC2(self, token):
-        self.write(u'\n\n<h1>' + token.value + u'</h1>')
+        if not self.bookName:
+            self.bookName = token.value
+            self.writeHeader()
 
     def renderMT(self, token):
-        return; #self.write(u'\n\n<h1>' + token.value + u'</h1>') # removed to use TOC2
+        return  #self.write(u'\n\n<h1>' + token.value + u'</h1>') # removed to use TOC2
 
     def renderMT2(self, token):
         self.write(u'\n\n<h2>' + token.value + u'</h2>')
@@ -320,7 +326,7 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
             self.write(u'<p class="footnotes">')
             for fkey in sorted(fkeys):
                 footnote = self.footnotes[fkey]
-                self.write(u'<span id="{0}" class="footnote"><i>{1}:{2} <sup><a href="#ref-{0}">{5}</a></sup></a><i><span class="text">{6}</span><br/>'.
+                self.write(u'<div id="{0}" class="footnote"><i>{1}:{2} <sup><a href="#ref-{0}">{5}</a></sup></a><i><span class="text">{6}</div>'.
                            format(fkey, footnote['chapter'].lstrip('0'), footnote['verse'].lstrip('0'), footnote['chapter'], footnote['verse'],\
                                   footnote['letter'], footnote['text']))
             self.write(u'</p>')
