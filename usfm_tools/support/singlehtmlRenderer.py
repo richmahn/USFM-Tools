@@ -313,7 +313,6 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
             self.footnote_text = u''
             self.footnote_id = u''
 
-
     def writeFootnotes(self):
         fkeys = self.footnotes.keys()
         if len(fkeys) > 0:
@@ -321,7 +320,7 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
             self.write(u'<p class="footnotes">')
             for fkey in sorted(fkeys):
                 footnote = self.footnotes[fkey]
-                self.write(u'<span id="{0}" class="footnote"><i>{1}:{2} <sup><a href="#ch-{3}-v-{4}">{5}</a></sup></a><i><span class="text">{6}</span><br/>'.
+                self.write(u'<span id="{0}" class="footnote"><i>{1}:{2} <sup><a href="#ref-{0}">{5}</a></sup></a><i><span class="text">{6}</span><br/>'.
                            format(fkey, footnote['chapter'].lstrip('0'), footnote['verse'].lstrip('0'), footnote['chapter'], footnote['verse'],\
                                   footnote['letter'], footnote['text']))
             self.write(u'</p>')
