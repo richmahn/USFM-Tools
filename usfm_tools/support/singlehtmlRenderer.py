@@ -6,12 +6,13 @@ import codecs
 import datetime
 import books
 
+from parseUsfm import UsfmToken
+
 #
 #   Simplest renderer. Ignores everything except ascii text.
 #
 
 class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
-
     def __init__(self, inputDir, outputFilename):
         # Unset
         self.f = None  # output file stream
@@ -21,11 +22,17 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         # Position
         self.cb = u''    # Current Book
         self.cc = u'001'    # Current Chapter
-        self.cv = u'001'    # Currrent Verse
+        self.cv = u'001'    # Current Verse
         self.indentFlag = False
         self.bookName = u''
         self.chapterLabel = 'Chapter'
         self.lineIndent = 0
+        self.footnoteFlag = False
+        self.fqaFlag = False
+        self.footnotes = {}
+        self.footnote_id = ''
+        self.footnote_letter = b'a'
+        self.footnote_text = ''
 
     def render(self):
         self.loadUSFM(self.inputDir)
@@ -66,6 +73,12 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
             .tetragrammaton {
                 font-variant: small-caps;
             }
+            .footnotes {
+                font-size: 0.8em;
+            }
+            .footnotes-hr {
+                width: 90%;
+            }
             </style>
 
         </head>
@@ -73,6 +86,7 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         """
         self.f.write(h.encode('utf-8'))
         self.run()
+        self.writeFootnotes()
         self.f.write('</body></html>')
         self.f.close()
 
@@ -103,11 +117,12 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
             self.indentFlag = True
             self.write(u'<p>')
         self.write(u'<p class="indent-' + str(level) + u'">')
+        self.write(u'&nbsp;' * (level*4))
 
     def renderID(self, token):
         self.cb = books.bookKeyForIdValue(token.value)
         self.indentFlag = False
-        self.write(u'\n\n<h1 id="' + self.cb + u'"></h1>\n')
+        self.write(u'\n\n<span id="' + self.cb + u'"></span>\n')
 
     def renderH(self, token):
         self.bookname = token.value
@@ -151,12 +166,16 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         self.write(u'\n\n<p align="center">----</p>')
 
     def renderC(self, token):
+        self.closeFootnote()
+        self.writeFootnotes()
+        self.footnote_letter = 'a'
         self.cc = token.value.zfill(3)
-        self.write(self.stopLI() + u'\n\n<h2 class="c-num">'+self.chapterLabel+' ' + token.value + u'</h2>')
+        self.write(self.stopLI() + u'\n\n<h2 id="ch-'+self.cc+u'" class="c-num">'+self.chapterLabel+' ' + token.value + u'</h2>')
 
     def renderV(self, token):
+        self.closeFootnote()
         self.cv = token.value.zfill(3)
-        self.write(u' <span class="v-num"><sup><b>' + token.value + u'</b></sup></span>')
+        self.write(u' <span id="ch-'+self.cc+u'-v-'+self.cv+u'" class="v-num"><sup><b>' + token.value + u'</b></sup></span>')
 
     def renderWJS(self, token):
         self.write(u'<span class="woc">')
@@ -207,13 +226,22 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         self.write(u'</b>')
 
     def renderFS(self, token):
-        self.write(u'<i>[Note: ')
+        self.closeFootnote()
+        self.footnote_id = "fn-{0}-{1}-{2}".format(self.cb, self.cc, self.cv, self.footnote_letter)
+        self.write(u'<span id="ref-{0}"><sup><a href="#{0}">{1}</a></sup></span>'.format(self.footnote_id, self.footnote_letter))
+        self.footnoteFlag = True
+        text = token.value
+        if text.startswith('+ '):
+            text = text[2:]
+        elif text.startswith('+'):
+            text = text[1:]
+        self.footnote_text = text
 
     def renderFT(self, token):
-        self.write(token.value)
+        self.footnote_text += token.value
 
     def renderFE(self, token):
-        self.write(u']</i> ')
+        self.closeFootnote()
 
     def renderQSS(self, token):
         self.write(u'<i>')
@@ -259,10 +287,42 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         self.write(u'')
 
     def renderFQA(self, token):
-        self.write(u' "' + token.value)
+        self.footnote_text += '<i>'+token.value
+        self.fqaFlag = True
 
     def renderFQAE(self, token):
-        self.write(u'"' + token.value)
+        self.footnote_text += '</i>'+token.value
+        self.fqaFlag = False
 
-    def renderFQB(self, token):
-        self.write(u': ' + token.value)
+    def closeFootnote(self):
+        if self.footnoteFlag:
+            self.footnoteFlag = False
+            if self.fqaFlag:
+                self.renderFQAE(UsfmToken(''))
+            self.footnotes[self.footnote_id] = {
+                'text': self.footnote_text,
+                'book': self.cb,
+                'chapter': self.cc,
+                'verse': self.cv,
+                'letter': self.footnote_letter
+            }
+            if self.footnote_letter == 'z':
+                self.footnote_letter = 'a'
+            else:
+                self.footnote_letter = chr(ord(self.footnote_letter)+1)
+            self.footnote_text = ''
+            self.footnote_id = ''
+
+
+    def writeFootnotes(self):
+        fkeys = self.footnotes.keys()
+        if len(fkeys) > 0:
+            self.write('<hr class="footnotes-hr"/>')
+            self.write('<p class="footnotes">')
+            for fkey in sorted(fkeys):
+                footnote = self.footnotes[fkey]
+                self.write('<span id="{0}" class="footnote"><i>{1}:{2} <sup><a href="#ch-{3}-v-{4}">{5}</a></sup></a><i><span class="text">{6}</span><br/>'.
+                           format(fkey, footnote['chapter'].lstrip('0'), footnote['verse'].lstrip('0'), footnote['chapter'], footnote['verse'],\
+                                  footnote['letter'], footnote['text']))
+            self.write('</p>')
+        self.footnotes = {}

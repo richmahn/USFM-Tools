@@ -414,7 +414,7 @@ class USXRenderer(abstractRenderer.AbstractRenderer):
         pass
 
     def renderFQB(self, token):
-        self.f.write(self.stop_c() + '\n  <char style="fqb">' + self.escape(token.value) + '</char>')
+        pass
 
     def renderXS(self, token):
         self.f.write(self.stop_c() + '\n<note caller="-" style="x">')
