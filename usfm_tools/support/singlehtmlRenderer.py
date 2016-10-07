@@ -25,14 +25,14 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         self.cv = u'001'    # Current Verse
         self.indentFlag = False
         self.bookName = u''
-        self.chapterLabel = 'Chapter'
+        self.chapterLabel = u'Chapter'
         self.lineIndent = 0
         self.footnoteFlag = False
         self.fqaFlag = False
         self.footnotes = {}
-        self.footnote_id = ''
-        self.footnote_letter = b'a'
-        self.footnote_text = ''
+        self.footnote_id = u''
+        self.footnote_letter = u'a'
+        self.footnote_text = u''
 
     def render(self):
         self.loadUSFM(self.inputDir)
@@ -227,13 +227,13 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
 
     def renderFS(self, token):
         self.closeFootnote()
-        self.footnote_id = "fn-{0}-{1}-{2}".format(self.cb, self.cc, self.cv, self.footnote_letter)
+        self.footnote_id = u'fn-{0}-{1}-{2}-{3}'.format(self.cb, self.cc, self.cv, self.footnote_letter)
         self.write(u'<span id="ref-{0}"><sup><a href="#{0}">{1}</a></sup></span>'.format(self.footnote_id, self.footnote_letter))
         self.footnoteFlag = True
         text = token.value
-        if text.startswith('+ '):
+        if text.startswith(u'+ '):
             text = text[2:]
-        elif text.startswith('+'):
+        elif text.startswith(u'+'):
             text = text[1:]
         self.footnote_text = text
 
@@ -287,18 +287,18 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         self.write(u'')
 
     def renderFQA(self, token):
-        self.footnote_text += '<i>'+token.value
+        self.footnote_text += u'<i>'+token.value
         self.fqaFlag = True
 
     def renderFQAE(self, token):
-        self.footnote_text += '</i>'+token.value
+        self.footnote_text += u'</i>'+token.value
         self.fqaFlag = False
 
     def closeFootnote(self):
         if self.footnoteFlag:
             self.footnoteFlag = False
             if self.fqaFlag:
-                self.renderFQAE(UsfmToken(''))
+                self.renderFQAE(UsfmToken(u''))
             self.footnotes[self.footnote_id] = {
                 'text': self.footnote_text,
                 'book': self.cb,
@@ -306,23 +306,23 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
                 'verse': self.cv,
                 'letter': self.footnote_letter
             }
-            if self.footnote_letter == 'z':
-                self.footnote_letter = 'a'
+            if self.footnote_letter == u'z':
+                self.footnote_letter = u'a'
             else:
                 self.footnote_letter = chr(ord(self.footnote_letter)+1)
-            self.footnote_text = ''
-            self.footnote_id = ''
+            self.footnote_text = u''
+            self.footnote_id = u''
 
 
     def writeFootnotes(self):
         fkeys = self.footnotes.keys()
         if len(fkeys) > 0:
-            self.write('<hr class="footnotes-hr"/>')
-            self.write('<p class="footnotes">')
+            self.write(u'<hr class="footnotes-hr"/>')
+            self.write(u'<p class="footnotes">')
             for fkey in sorted(fkeys):
                 footnote = self.footnotes[fkey]
-                self.write('<span id="{0}" class="footnote"><i>{1}:{2} <sup><a href="#ch-{3}-v-{4}">{5}</a></sup></a><i><span class="text">{6}</span><br/>'.
+                self.write(u'<span id="{0}" class="footnote"><i>{1}:{2} <sup><a href="#ch-{3}-v-{4}">{5}</a></sup></a><i><span class="text">{6}</span><br/>'.
                            format(fkey, footnote['chapter'].lstrip('0'), footnote['verse'].lstrip('0'), footnote['chapter'], footnote['verse'],\
                                   footnote['letter'], footnote['text']))
-            self.write('</p>')
+            self.write(u'</p>')
         self.footnotes = {}
