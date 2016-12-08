@@ -94,11 +94,7 @@ fk = usfmTokenValue("fk", phrase)
 ft = usfmTokenValue("ft", phrase)
 fq = usfmTokenValue("fq", phrase)
 fqa = usfmTokenValue("fqa", phrase)
-<<<<<<< HEAD
 fqae = usfmTokenValue("fqae", phrase)
-=======
-fqae = usfmEndToken("fqa")
->>>>>>> uwdev/master
 fqb = usfmTokenValue("fqb", phrase)
 fe = usfmEndToken("f")
 fp = usfmToken("fp")
