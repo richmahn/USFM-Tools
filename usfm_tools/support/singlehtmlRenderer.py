@@ -253,6 +253,9 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
     def renderFE(self, token):
         self.closeFootnote()
 
+    def renderFP(self, token):
+        self.write(u'<br />')
+
     def renderQSS(self, token):
         self.write(u'<i>')
 
@@ -289,6 +292,15 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
 
     def renderS5(self, token):
         self.write(u'\n<span class="chunk-break"></span>\n')
+
+    def render_imt1(self, token):
+        self.write(u'\n\n<h2>' + token.value + u'</h2>')
+
+    def render_imt2(self, token):
+        self.write(u'\n\n<h3>' + token.value + u'</h3>')
+
+    def render_imt3(self, token):
+        self.write(u'\n\n<h4>' + token.value + u'</h4>')
 
     def renderCL(self, token):
         self.chapterLabel = token.value
@@ -332,3 +344,4 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
                                   footnote['footnote'], footnote['text']))
             self.write(u'</div>')
         self.footnotes = {}
+

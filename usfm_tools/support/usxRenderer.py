@@ -410,6 +410,9 @@ class USXRenderer(abstractRenderer.AbstractRenderer):
     def renderFQA(self, token):
         self.f.write(self.stop_c() + '\n  <char style="fqa">' + self.escape(token.value) + '</char>')
 
+    def renderFP(self, token):
+        self.f.write(self.stop_c() + '\n')
+
     def renderFQAE(self, token):
         pass
 
@@ -502,6 +505,15 @@ class USXRenderer(abstractRenderer.AbstractRenderer):
 
     def renderTCR6(self, token):
         self.f.write(self.stop_all_to_cell() + self.start_cell('tcr6', 'end'))
+
+    def render_imt1(self, token):
+        self.f.write(self.stop_all() + '\n<para style="imt1">' + token.value.upper() + '</para>')
+
+    def render_imt2(self, token):
+        self.f.write(self.stop_all() + '\n<para style="imt2">' + token.value.upper() + '</para>')
+
+    def render_imt3(self, token):
+        self.f.write(self.stop_all() + '\n<para style="imt3">' + token.value.upper() + '</para>')
 
     def renderUnknown(self, token):
         if token.value == 'v':

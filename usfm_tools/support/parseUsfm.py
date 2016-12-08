@@ -94,9 +94,14 @@ fk = usfmTokenValue("fk", phrase)
 ft = usfmTokenValue("ft", phrase)
 fq = usfmTokenValue("fq", phrase)
 fqa = usfmTokenValue("fqa", phrase)
+<<<<<<< HEAD
 fqae = usfmTokenValue("fqae", phrase)
+=======
+fqae = usfmEndToken("fqa")
+>>>>>>> uwdev/master
 fqb = usfmTokenValue("fqb", phrase)
 fe = usfmEndToken("f")
+fp = usfmToken("fp")
 
 # Cross References
 xs = usfmTokenValue("x", plus)
@@ -182,6 +187,10 @@ io1 = usfmToken("io1") | usfmToken("io")
 io2 = usfmToken("io2")
 ior_s = usfmToken("ior")
 ior_e = usfmEndToken("ior")
+imt = usfmTokenValue("imt", phrase)
+imt1 = usfmTokenValue("imt1", phrase)
+imt2 = usfmTokenValue("imt2", phrase)
+imt3 = usfmTokenValue("imt3", phrase)
 
 # Quoted book title
 bk_s = usfmToken("bk")
@@ -242,6 +251,7 @@ element = MatchFirst([ide, id_token, h, toc, toc1, toc2, toc3, mt, mt1, mt2, mt3
                       fqae,
                       fqb,
                       fe,
+                      fp,
                       xs,
                       xdcs,
                       xdce,
@@ -272,6 +282,10 @@ element = MatchFirst([ide, id_token, h, toc, toc1, toc2, toc3, mt, mt1, mt2, mt3
                       io2,
                       ior_s,
                       ior_e,
+                      imt,
+                      imt1,
+                      imt2,
+                      imt3,
                       bk_s,
                       bk_e,
                       scs,
@@ -388,6 +402,7 @@ def createToken(t):
         'fqa*': FQAEToken,
         'fqb': FQAEToken,
         'f*': FEToken,
+        'fp': FPToken,
         'x': XSToken,
         'xdc': XDCSToken,
         'xdc*': XDCEToken,
@@ -449,6 +464,10 @@ def createToken(t):
         'toc3': TOC3Token,
         'is': IS1_Token,
         'is1': IS1_Token,
+        'imt': IMT1_Token,
+        'imt1': IMT1_Token,
+        'imt2': IMT2_Token,
+        'imt3': IMT3_Token,
         'ip': IP_Token,
         'iot': IOT_Token,
         'io': IO1_Token,
@@ -595,6 +614,8 @@ class UsfmToken(object):
 
     def isFE(self): return False
 
+    def isFP(self): return False
+
     def isXS(self): return False
 
     def isXDCS(self): return False
@@ -712,6 +733,12 @@ class UsfmToken(object):
     def is_toc3(self): return False
 
     def is_is1(self): return False
+
+    def is_imt1(self): return False
+
+    def is_imt2(self): return False
+
+    def is_imt3(self): return False
 
     def is_ip(self): return False
 
@@ -1137,6 +1164,13 @@ class FEToken(UsfmToken):
     def isFE(self): return True
 
 
+class FPToken(UsfmToken):
+    def renderOn(self, printer):
+        return printer.renderFP(self)
+
+    def isFP(self): return True
+
+
 class ISToken(UsfmToken):
     def renderOn(self, printer):
         return printer.renderIS(self)
@@ -1546,6 +1580,24 @@ class IS1_Token(UsfmToken):
     def renderOn(self, printer): return printer.render_is1(self)
 
     def is_is1(self): return True
+
+
+class IMT1_Token(UsfmToken):
+    def renderOn(self, printer): return printer.render_imt1(self)
+
+    def is_imt1(self): return True
+
+
+class IMT2_Token(UsfmToken):
+    def renderOn(self, printer): return printer.render_imt2(self)
+
+    def is_imt2(self): return True
+
+
+class IMT3_Token(UsfmToken):
+    def renderOn(self, printer): return printer.render_imt3(self)
+
+    def is_imt3(self): return True
 
 
 class IP_Token(UsfmToken):

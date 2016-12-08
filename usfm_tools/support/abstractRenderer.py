@@ -82,6 +82,7 @@ class AbstractRenderer(object):
     def renderFK(self, token):      pass
     def renderFT(self, token):      pass
     def renderFQ(self, token):      pass
+    def renderFP(self, token):      pass
 
     def renderIS(self, token):      pass
     def renderIE(self, token):      pass
@@ -110,6 +111,9 @@ class AbstractRenderer(object):
     def renderADDE(self, token):    pass
 
     def render_is1(self, token):    pass
+    def render_imt1(self, token):   pass
+    def render_imt2(self, token):   pass
+    def render_imt3(self, token):   pass
     def render_ip(self, token):     pass
     def render_iot(self, token):    pass
     def render_io1(self, token):    pass

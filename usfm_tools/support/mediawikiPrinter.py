@@ -81,6 +81,9 @@ class MediaWikiPrinter(object):
     def renderFE(self, token):
         if self.footnoteFlag:       self.footnoteFlag = False; self.write(u' -->')
         self.write(u'</ref>')
+    def renderFP(self, token):
+        self.indentFlag = False
+        self.write(u'\n\n')
     def renderIS(self, token):      pass
     def renderIE(self, token):      pass
     def renderB(self, token):       pass
@@ -107,7 +110,7 @@ class MediaWikiPrinter(object):
     def renderPI(self, token):      pass
     def renderSCS(self, token):     pass
     def renderSCE(self, token):     pass
-    def renderD(self, token):       pass # For now    
+    def renderD(self, token):       pass # For now
     def renderREM(self, token):     pass # This is for comments in the USFM
 
 class Transform(object):

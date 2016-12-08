@@ -16,7 +16,7 @@ class DummyFile(object):
         pass
 
 class HTMLRenderer(abstractRenderer.AbstractRenderer):
-    
+
     def __init__(self, inputDir, outputDir, oebFlag=False):
         # Unset
         self.f = DummyFile()  # output file stream
@@ -36,32 +36,32 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         self.oebFlag = oebFlag
         self.fileCounter = 0
         self.secondaryCounter = 0
-        
+
     def render(self):
         self.f = DummyFile()
         # Write pages
         self.loadUSFM(self.inputDir)
         self.run()
         self.close()
-        
+
     def writeLog(self, s):
         print s
-        
-    # File handling    
-        
+
+    # File handling
+
     def openFile(self, bookID):
         self.f = open(self.outputDir + u'/b' + bookID + u'_' + str(self.fileCounter) + u'.html', 'w')
         self.bookID = bookID
         self.ft = []
-        
-    def close(self): 
+
+    def close(self):
         t = u''.join(self.ft)
         self.f.write(self.cleanHTML(t).encode('utf-8'))
         self.f.close()
- 
+
     def write(self, unicodeString):
         self.ft.append(unicodeString)
-        
+
     def cleanHTML(self, t):
         c = t
         c = t.replace(u'<p><br /><br />', u'<p>')
@@ -73,7 +73,7 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
             c = c.replace(ur'%navmarker%', u'<div style="font-size:200%;color:green;">✝</div>')
             c = c.replace(ur'%linkToWebsite%',u'')
         return c
-        
+
     # Support
     def incrementFile(self):
         self.ft.append(footer)
@@ -93,7 +93,7 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         if level == 0:
             self.indentFlag = False
             self.write(u'<br /><br />')
-            return 
+            return
         if not self.indentFlag:
             self.indentFlag = True
             self.write(u'<br />')
@@ -101,7 +101,7 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         self.write(u'&nbsp;&nbsp;' * level)
         self.writeChapterMarker()
 
-    def renderID(self, token): 
+    def renderID(self, token):
         self.write(footer)
         self.close()
         self.cb = books.bookKeyForIdValue(token.value)
@@ -222,13 +222,17 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
     def renderD(self, token):       self.writeChapterMarker()
 
     def render_is1(self, token):    self.renderS(token)
+    def render_imt1(self, token):   self.write(u'</p><h2>' + token.value + u'</h2><p>')
+    def render_imt2(self, token):   self.write(u'</p><h3>' + token.value + u'</h3><p>')
+    def render_imt3(self, token):   self.write(u'</p><h4>' + token.value + u'</h4><p>')
     def render_ip(self, token):     self.renderP(token)
     def render_iot(self, token):    self.renderQ(token)
     def render_io1(self, token):    self.renderQ2(token)
-    
+
     def renderFS(self, token):      self.write(u'<span class="rightnotemarker">*</span><span class="rightnote">')
     def renderFE(self, token):      self.write(u'</span>')
-    
+    def renderFP(self, token):      self.write(u'<br />')
+
 
 #
 #  Structure
@@ -241,20 +245,20 @@ header = ur"""<!DOCTYPE html>
     <meta charset='utf-8'>
     <style type="text/css">
     @media all {
-        html {font-size: 19px;} 
+        html {font-size: 19px;}
         body {
             padding: 0rem 0em 0rem 0em;
             margin-left:auto;
             margin-right:auto;
             width:100%;
             min-height: 100%;
-            position: relative; 
+            position: relative;
         }
         body > * {
             font-size: 100%;
             line-height: 135%;
             text-rendering: optimizeLegibility;
-            margin-left: 7rem; 
+            margin-left: 7rem;
             margin-right: 7rem;
         }
         .chapter{
@@ -278,7 +282,7 @@ header = ur"""<!DOCTYPE html>
         	position: absolute;
         	right: 0rem;
         	width: 6rem;
-        	text-align: left;	
+        	text-align: left;
         	color: gray;
         	font-size: 80%;
         }
@@ -351,17 +355,17 @@ header = ur"""<!DOCTYPE html>
     @media all and (max-width:680px){html {font-size: 16px;}}
     @media all and (max-width:640px){html {font-size: 14px;}}
     @media all and (max-width:600px){html {font-size: 12px;}}
-    
+
     /* iPhone 2 - 4 */
-    @media only screen 
-    and (min-device-width : 320px) 
-    and (max-device-width : 480px) 
+    @media only screen
+    and (min-device-width : 320px)
+    and (max-device-width : 480px)
     and (orientation : portrait) {
         html {font-size: 58px;}
         body {
             margin:0;
             padding:0;
-        } 
+        }
         body > * { margin-left:100px; margin-right:0px; width:100%; }
         .chapter{
         	position: absolute;
@@ -390,7 +394,7 @@ header = ur"""<!DOCTYPE html>
         """
 
 footer = ur"""
-        </p></body>   
+        </p></body>
         """
 
 indexPage = header + ur"""<h1>Bible</h1>""" + footer

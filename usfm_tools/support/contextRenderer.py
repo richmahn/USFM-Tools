@@ -191,6 +191,7 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
     def renderNB(self, token):      self.doNB = True ; self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() + u'\\blank[medium] ' + self.newLine() )
     def renderFS(self, token):      self.f.write( u'\\footnote{' )
     def renderFE(self, token):      self.f.write( u'} ' )
+    def renderFP(self, token):      self.f.write( self.newLine() )
     def renderIS(self, token):      self.f.write( u'{\em ' )
     def renderIE(self, token):      self.f.write( u'} ' )
     def renderBDS(self, token):     self.f.write( u'{\\bf ')
@@ -218,11 +219,13 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
     def renderQSE(self, token):      return
 
     def render_is1(self, token):    self.renderS(token)
+    def render_imt1(self, token):   self.f.write( self.stopLI() + self.stopNarrower() + u'\n\IMT1{' + token.value + u'}\n')
+    def render_imt2(self, token):   self.f.write( self.stopLI() + self.stopNarrower() + u'\n\IMT2{' + token.value + u'}\n')
+    def render_imt3(self, token):   self.f.write( self.stopLI() + self.stopNarrower() + u'\n\IMT3{' + token.value + u'}\n')
     def render_ip(self, token):     self.renderP(token)
     def render_iot(self, token):    self.renderQ(token)
     def render_io1(self, token):    self.renderQ2(token)
-    def render_io1(self, token):    self.renderQ2(token)
-
+    def render_io2(self, token):    self.renderQ2(token)
 
     closeTeXt = ur"""
     \stoptext
